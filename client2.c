@@ -77,6 +77,11 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case 2:
+                char path[256];
+                printf("Saisir le chemin du répertoire\n");
+                scanf("%s",path);
+                write(client_socket,path,sizeof(path));
+                
                 bytesRead = read(client_socket, buffer, sizeof(buffer));
                 if (bytesRead > 0) {
                     printf("%s\n",buffer);
@@ -87,6 +92,11 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case 3:
+                char name[256];
+                printf("Saisir le nom du fichier\n");
+                scanf("%s",name);
+                write(client_socket,name,sizeof(name));
+                
                 bytesRead = read(client_socket, buffer, sizeof(buffer));
                 if (bytesRead > 0) {
                     printf("%s\n",buffer);

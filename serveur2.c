@@ -12,7 +12,11 @@ void error(const char *msg) {
     perror(msg);
     exit(1);
 }
-
+typedef struct UserCredentials{
+    char username[100];
+    char password[100];
+}
+struct UserCredentials{}
 // Fonction pour envoyer la date et l'heure au client
 void sendDateTime(int client_socket) {
     time_t t;
@@ -40,20 +44,24 @@ void sendFileList(int client_socket, const char *directory_path) {
             strcat(buffer,strcat(file->d_name,"\n"));
 
         }
-        printf("LEFT WHILE\n");
     closedir(dir);
-    sleep(0.5);
+
+    }
+    else
+    {
+        strcat(buffer,"Le chemin saisi est invalide !");
+    }
     if (write(client_socket,buffer,sizeof(buffer)) < 0)
         error("Erreur lors de l'envoi de la liste des fichiers");
-    }
 }
 
 // Fonction pour envoyer le contenu d'un fichier au client
 void sendFileContent(int client_socket, const char *file_path) {
     FILE *file = fopen(file_path, "r");
-    if (file == NULL) {
-        error("Erreur lors de l'ouverture du fichier");
-    }
+    if (file == NULL)
+        printf("Fichier inexistant!");
+    else
+    {
     char buffer[MAX_BUFFER_SIZE];
     int bytesRead;
     while ((bytesRead = fread(buffer, 1, sizeof(buffer), file)) > 0) {
@@ -62,6 +70,7 @@ void sendFileContent(int client_socket, const char *file_path) {
         }
     }
     fclose(file);
+    }
 }
 
 // Fonction pour envoyer la durée écoulée depuis le début de la connexion
@@ -114,12 +123,15 @@ void handleClient(int client_socket){
                     sendDateTime(client_socket);
                     break;
                 case 2:
-                    printf("2\n");
+                    char path[256];
+                    read(client_socket,path,sizeof(path));
                     // Envoie de la liste des fichiers d'un répertoire
-                    sendFileList(client_socket,"."); // Vous pouvez changer "." avec le chemin du répertoire souhaité
+                    sendFileList(client_socket,path); // Vous pouvez changer "." avec le chemin du répertoire souhaité
                     break;
                 case 3:
-                    sendFileContent(client_socket,"client.c");
+                    char name[256];
+                    read(client_socket,name,sizeof(name));
+                    sendFileContent(client_socket,name);
                     break;
                 case 4:
                     // Envoie de la durée déjà écoulée depuis le début de la connexion du client courant
