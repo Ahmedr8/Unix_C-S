@@ -3,15 +3,26 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-
+#include <termios.h>
 #define MAX_BUFFER_SIZE 1024
 
 void error(const char *msg) {
-        printf("WE GOT HERE");
     perror(msg);
     exit(1);
 }
-
+void enableEcho(){
+    struct termios term;
+    tcgetattr(STDIN_FILENO,&term);
+    term.c_lflag |= ECHO;
+    tcsetattr(STDIN_FILENO,TCSANOW,&term);
+}
+void disableEcho(){
+    struct termios oldTerm,newTerm;
+    tcgetattr(STDERR_FILENO,&oldTerm);
+    newTerm = oldTerm;
+    newTerm.c_lflag &= ~ECHO;
+    tcsetattr(STDIN_FILENO,TCSANOW,&newTerm);
+}
 int main(int argc, char *argv[]) {
     int choice;
     const char *server_address = argv[1];
@@ -37,8 +48,34 @@ int main(int argc, char *argv[]) {
     if (connect(client_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
         error("Erreur lors de la connexion au serveur");
     }
-
-    printf("Connecté au serveur %s:%d\n", server_address, server_port);
+    char username[100];
+    char password[100];
+    int loggedIn = 0;
+    while(!loggedIn)
+    {   printf("username:");
+        fflush(stdout);
+        scanf("%s",username);
+        printf("password for %s:",username);
+        fflush(stdout);
+        disableEcho();
+        scanf("%s",password);
+        enableEcho();
+        write(client_socket,username,sizeof(username));
+        write(client_socket,password,sizeof(password));
+        ssize_t bytesRead = read(client_socket,&loggedIn,sizeof(loggedIn));
+        if (bytesRead > 0) {
+          if(loggedIn == 0){
+            printf("\nIncorrect username or password !\n");
+           }
+        }
+        else if (bytesRead == 0) {
+            printf("La connexion a été fermée par le serveur.\n");
+        }     
+        else {
+            error("Erreur lors de la lecture de la réponse du serveur");
+        }
+    }
+    printf("\nConnecté au serveur %s:%d\n", server_address, server_port);
 
     // Code pour l'authentification (nom d'utilisateur + mot de passe) auprès du serveur
     // (à implémenter)

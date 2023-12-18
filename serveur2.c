@@ -7,16 +7,45 @@
 #include <dirent.h>
 #define _GNU_SOURCE
 #define MAX_BUFFER_SIZE 1024
-
+typedef struct userCredentials{
+    char username[100];
+    char password[100];
+}UserCredentials;
+const UserCredentials users[] = {
+    {
+        "ahmed","ahmed"
+    },
+    {
+        "elyes","elyes"
+    },
+    {
+        "topadmin","topadmin"
+    },
+    {
+        "root","root"
+    },
+    {
+        "user","user"
+    }
+};
 void error(const char *msg) {
     perror(msg);
     exit(1);
 }
-typedef struct UserCredentials{
-    char username[100];
-    char password[100];
+int loginUser(char username[100],char password[100],int client_socket){
+    int length = sizeof(users)/sizeof(users[0]);
+    int loggedIn = 0;
+   for(int i = 0 ; i<length;i++){
+    if (strcmp(users[i].username,username) == 0 && strcmp(users[i].password,password) == 0){
+       loggedIn = 1;
+       printf("SHOULD BE ACCEPTED\n");
+       write(client_socket,&loggedIn,sizeof(loggedIn));
+       return loggedIn;
+    }
+   }
+   write(client_socket,&loggedIn,sizeof(loggedIn));
+   return loggedIn;
 }
-struct UserCredentials{}
 // Fonction pour envoyer la date et l'heure au client
 void sendDateTime(int client_socket) {
     time_t t;
@@ -171,6 +200,9 @@ int main(int argc, char *argv[]) {
 
     printf("Serveur en attente sur le port %d...\n", server_port);
     int n;
+    char username[100];
+    char password[100];
+    int loggedIn = 0;
     while (1) {
 
         socklen_t client_addr_len = sizeof(client_addr);
@@ -178,6 +210,15 @@ int main(int argc, char *argv[]) {
         int client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_len);
         if (client_socket < 0) {
             error("Erreur lors de l'acceptation de la connexion client\n");
+        }
+
+
+        while(loggedIn == 0)
+        {           
+            read(client_socket,username,sizeof(username));
+            read(client_socket,password,sizeof(password));
+            loggedIn = loginUser(username,password,client_socket);
+            printf("%d\n",loggedIn);
         }
         printf("Nouvelle connexion acceptée.\n");
         //FORK
