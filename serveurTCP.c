@@ -164,13 +164,13 @@ void handleClient(int client_socket){
                     // Envoie de la durée déjà écoulée depuis le début de la connexion du client courant
                     sendElapsedTime(client_socket, start_time);
                     break;
+                case 5:
+                    close(client_socket);
+                    break;
                 default:
                     printf("Option invalide.\n");
             }
         }while(choice!=5);
-
-        // Fermeture de la connexion client
-        close(client_socket);
 }
 int main(int argc, char *argv[]) {
 
@@ -204,18 +204,17 @@ int main(int argc, char *argv[]) {
 
         socklen_t client_addr_len = sizeof(client_addr);
         // Attente d'une connexion client
-        int client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_len);
+        int client_socket =  0;
+        client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_len);
         if (client_socket < 0) {
             error("Erreur lors de l'acceptation de la connexion client\n");
         }
-
         //FORK
         n = fork();
         if ( n < 0)
             perror("Erreur lors de la création du fils\n");
         if (n == 0){
             int loggedIn = 0;
-            close(server_socket);
             while(loggedIn == 0)
         {           
             read(client_socket,username,sizeof(username));
@@ -224,7 +223,6 @@ int main(int argc, char *argv[]) {
         }
         printf("Nouvelle connexion acceptée.\n");
             handleClient(client_socket);
-            
         }
         else
         {

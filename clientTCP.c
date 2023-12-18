@@ -158,10 +158,11 @@ int main(int argc, char *argv[]) {
             case 5:
                 printf("Déconnexion.\n");
                 close(client_socket);
-                exit(0);
+                break;
             default:
                 printf("Option invalide.\n");
         }
+    
     }while(choice != 5);
     return 0;
 }
