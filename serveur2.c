@@ -38,7 +38,6 @@ int loginUser(char username[100],char password[100],int client_socket){
    for(int i = 0 ; i<length;i++){
     if (strcmp(users[i].username,username) == 0 && strcmp(users[i].password,password) == 0){
        loggedIn = 1;
-       printf("SHOULD BE ACCEPTED\n");
        write(client_socket,&loggedIn,sizeof(loggedIn));
        return loggedIn;
     }
@@ -147,7 +146,6 @@ void handleClient(int client_socket){
             }
             switch (choice) {
                 case 1:
-                    printf("1\n");
                     // Envoie de la date complète (jour / mois / année) et l'heure (heure: minutes: secondes) de l'horloge système du serveur
                     sendDateTime(client_socket);
                     break;
@@ -202,7 +200,6 @@ int main(int argc, char *argv[]) {
     int n;
     char username[100];
     char password[100];
-    int loggedIn = 0;
     while (1) {
 
         socklen_t client_addr_len = sizeof(client_addr);
@@ -212,29 +209,26 @@ int main(int argc, char *argv[]) {
             error("Erreur lors de l'acceptation de la connexion client\n");
         }
 
-
-        while(loggedIn == 0)
-        {           
-            read(client_socket,username,sizeof(username));
-            read(client_socket,password,sizeof(password));
-            loggedIn = loginUser(username,password,client_socket);
-            printf("%d\n",loggedIn);
-        }
-        printf("Nouvelle connexion acceptée.\n");
         //FORK
         n = fork();
         if ( n < 0)
             perror("Erreur lors de la création du fils\n");
         if (n == 0){
+            int loggedIn = 0;
             close(server_socket);
-            printf("FILS CREE\n");
+            while(loggedIn == 0)
+        {           
+            read(client_socket,username,sizeof(username));
+            read(client_socket,password,sizeof(password));
+            loggedIn = loginUser(username,password,client_socket);
+        }
+        printf("Nouvelle connexion acceptée.\n");
             handleClient(client_socket);
             
         }
         else
         {
             close(client_socket);
-            printf("PERE\n");
         }
     // Fermeture de la socket du serveur
 }

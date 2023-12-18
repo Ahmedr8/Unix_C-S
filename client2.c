@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
     {   printf("username:");
         fflush(stdout);
         scanf("%s",username);
-        printf("password for %s:",username);
+        printf("mot de passe pour %s:",username);
         fflush(stdout);
         disableEcho();
         scanf("%s",password);
@@ -63,9 +63,10 @@ int main(int argc, char *argv[]) {
         write(client_socket,username,sizeof(username));
         write(client_socket,password,sizeof(password));
         ssize_t bytesRead = read(client_socket,&loggedIn,sizeof(loggedIn));
+        printf("\n");
         if (bytesRead > 0) {
           if(loggedIn == 0){
-            printf("\nIncorrect username or password !\n");
+            printf("Nom d'utilisateur ou mot de passe incorrect !\n");
            }
         }
         else if (bytesRead == 0) {
