@@ -7,12 +7,13 @@
 #define MAX_BUFFER_SIZE 1024
 
 void error(const char *msg) {
+        printf("WE GOT HERE");
     perror(msg);
     exit(1);
 }
 
 int main(int argc, char *argv[]) {
-
+    int choice;
     const char *server_address = argv[1];
     const int server_port = atoi(argv[2]);
 
@@ -41,47 +42,64 @@ int main(int argc, char *argv[]) {
 
     // Code pour l'authentification (nom d'utilisateur + mot de passe) auprès du serveur
     // (à implémenter)
-
     char buffer[MAX_BUFFER_SIZE];
-    ssize_t bytesRead;
-    while (1) {
+    do{
         // Affichage du menu
-        printf("\nMenu:\n");
-      for(int i=1;i<3;++){
-    bytesRead = read(*, buffer, sizeof(buffer));
-    if (bytesRead < 0) {
-        error("Erreur lors de la lecture de la réponse du serveur");
+      for(int i=0;i<5;i++){
+    ssize_t bytesRead = read(client_socket, buffer, sizeof(buffer));
+    if (bytesRead > 0) {
+        printf("%s\n",buffer);
     } else if (bytesRead == 0) {
         printf("La connexion a été fermée par le serveur.\n");
     } else {
-        printf("%d : %s\n",i,buffer);
+        error("Erreur lors de la lecture de la réponse du serveur");
     }
+    write(client_socket,"Received",sizeof(char) * 9);
     }
 
         // Demande à l'utilisateur de choisir une option
         printf("Choix : ");
-        int choice;
         scanf("%d", &choice);
 
         // Envoi du choix au serveur
-            if (write(client_socket, choice, sizeof(choice)) < 0) {
-        error("Erreur lors de l'envoi du choi au serveur");
-    }
-
+            if (write(client_socket, &choice, sizeof(choice)) < 0) 
+                error("Erreur lors de l'envoi du choi au serveur");
         switch (choice) {
+            ssize_t bytesRead;
             case 1:
-                // La visualisation de la liste des services offerts par le serveur
-                // (à implémenter)
+                bytesRead = read(client_socket, buffer, sizeof(buffer));
+                if (bytesRead > 0) {
+                    printf("%s\n",buffer);
+                } else if (bytesRead == 0) {
+                    printf("La connexion a été fermée par le serveur.\n");
+                } else {
+                    error("Erreur lors de la lecture de la réponse du serveur");
+                }
                 break;
             case 2:
-                // Choix du service et envoi de la demande du service souhaité
-                // (à implémenter)
+                bytesRead = read(client_socket, buffer, sizeof(buffer));
+                if (bytesRead > 0) {
+                    printf("%s\n",buffer);
+                } else if (bytesRead == 0) {
+                    printf("La connexion a été fermée par le serveur.\n");
+                } else {
+                    error("Erreur lors de la lecture de la réponse du serveur");
+                }
                 break;
             case 3:
-                // La visualisation des résultats renvoyés par le serveur
-                // (à implémenter)
+                bytesRead = read(client_socket, buffer, sizeof(buffer));
+                if (bytesRead > 0) {
+                    printf("%s\n",buffer);
+                } else if (bytesRead == 0) {
+                    printf("La connexion a été fermée par le serveur.\n");
+                } else {
+                    error("Erreur lors de la lecture de la réponse du serveur");
+                }
                 break;
             case 4:
+                // CURRENT_TIME - CONNECTION_TIME
+                break;
+            case 5:
                 // Quitter
                 printf("Déconnexion.\n");
                 close(client_socket);
@@ -89,7 +107,6 @@ int main(int argc, char *argv[]) {
             default:
                 printf("Option invalide.\n");
         }
-    }
-
+    }while(choice != 4);
     return 0;
 }
