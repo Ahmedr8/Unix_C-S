@@ -5,9 +5,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-
+#include <time.h>
 #define MAX_BUFFER_SIZE 1024
-
 void error(const char *msg) {
     perror(msg);
     exit(1);
@@ -15,7 +14,7 @@ void error(const char *msg) {
 
 int main(int argc, char *argv[]) {
 
-
+    srand(time(NULL));
     const int server_port = atoi(argv[1]);
 
     // Création de la socket
