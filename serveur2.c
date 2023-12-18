@@ -68,9 +68,7 @@ void sendFileContent(int client_socket, const char *file_path) {
 void sendElapsedTime(int client_socket, time_t start_time) {
     time_t current_time;
     time(&current_time);
-
     double elapsed_time = difftime(current_time, start_time);
-
     if (write(client_socket, &elapsed_time, sizeof(elapsed_time)) < 0) {
         error("Erreur lors de l'envoi de la durée écoulée au client");
     }

@@ -97,16 +97,23 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case 4:
-                // CURRENT_TIME - CONNECTION_TIME
+                double timediff;
+                bytesRead = read(client_socket, &timediff, sizeof(timediff));
+                if (bytesRead > 0) {
+                    printf("%f\n",timediff);
+                } else if (bytesRead == 0) {
+                    printf("La connexion a été fermée par le serveur.\n");
+                } else {
+                    error("Erreur lors de la lecture de la réponse du serveur");
+                }
                 break;
             case 5:
-                // Quitter
                 printf("Déconnexion.\n");
                 close(client_socket);
                 exit(0);
             default:
                 printf("Option invalide.\n");
         }
-    }while(choice != 4);
+    }while(choice != 5);
     return 0;
 }
